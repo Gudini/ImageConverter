@@ -6,14 +6,13 @@
     <Grid Background="WhiteSmoke">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Background="WhiteSmoke">
             <Grid.RowDefinitions>
                 <RowDefinition Height="25"/>
                 <RowDefinition Height="31"/>
-                <RowDefinition Height="25"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Menu Grid.Row="0" IsMainMenu="True">
@@ -99,7 +98,7 @@
                 </Grid>
             </ScrollViewer>
         </Grid>
-        <StatusBar Grid.Row="4" VerticalAlignment="Bottom">
+        <StatusBar Grid.Row="1">
             <StatusBarItem>
                 <ProgressBar Width="100" Height="20">
                 </ProgressBar>
