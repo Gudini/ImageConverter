@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Microsoft.Win32;
+using System.Windows.Threading;
+using System.Drawing;
+using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 
 namespace ImageConverter
 {
@@ -23,23 +16,62 @@ namespace ImageConverter
         public MainWindow()
         {
             InitializeComponent();
+
+            _mReCal = new MedianFilterThread(delMessage, processBarValue);
+        }
+
+        private static BitmapImage _mBtImage;
+        private readonly MedianFilterThread _mReCal;
+        private int maxValueProcessBar;
+
+        public void delMessage(BitmapImage image)
+        {
+            Action action = new Action(delegate
+                                           {
+                                               ImageView2.Source = image;
+                                               MedianFilterItem.IsEnabled = true;
+                                               NegativItem.IsEnabled = true;
+                                               filterProcessBar.Value = 0;
+                                               LabelValueProcent.Content = "0 %";
+                                           });
+            ImageView2.Dispatcher.Invoke(action, DispatcherPriority.Normal);
+        }
+
+        public void processBarValue(int value, int procent)
+        {
+            Action action = new Action(delegate
+                                           {
+                                               filterProcessBar.Value = value;
+                                               LabelValueProcent.Content = procent+" %";
+                                           });
+            filterProcessBar.Dispatcher.Invoke(action, DispatcherPriority.Normal);
         }
 
         private void OpenFileClick(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog dlg = new OpenFileDialog();
-            dlg.InitialDirectory = "D:\\";
-            dlg.Filter = "Image files (*.jpg)|*.jpg|PNG (*.png)|*.png|BMP (*.bmp)|*.bmp|All Files(*.*)|*.*";
-            dlg.RestoreDirectory = true;
+            var dlg = new OpenFileDialog
+                          {
+                              InitialDirectory = "D:\\",
+                              Filter =
+                                  "Image files (*.jpg)|*.jpg|PNG (*.png)|*.png|BMP (*.bmp)|*.bmp|All Files(*.*)|*.*",
+                              RestoreDirectory = true
+                          };
             if(dlg.ShowDialog()==true)
             {
+                NegativItem.IsEnabled = true;
+                MedianFilterItem.IsEnabled = true;
+                
                 string selectedFileName = dlg.FileName;
-                BitmapImage bitmapImage = new BitmapImage();
+                var bitmapImage = new BitmapImage();
                 bitmapImage.BeginInit();
                 bitmapImage.UriSource = new Uri(selectedFileName);
                 bitmapImage.EndInit();
                 ImageView1.Source = bitmapImage;
-                this.Height = this.Width/2+25;
+
+                ImageView2.IsEnabled = true;
+                ImageView2.Source = bitmapImage;
+                _mBtImage = bitmapImage;
+
             }
         }
 
@@ -52,7 +84,27 @@ namespace ImageConverter
         {
             var filterDialog = new FilterDialog();
             filterDialog.ShowDialog();
-            int value = Convert.ToInt32(filterDialog.Value);
+
+            if(filterDialog.DialogResult==true)
+            {
+                int value = Convert.ToInt32(filterDialog.Value);
+
+                var bitmapConverter = new BitmapImageToBitmapConverter();
+                Bitmap mConvertBitmap = (Bitmap)bitmapConverter.ConvertBack(_mBtImage, null, null, null);
+
+                int w_b = mConvertBitmap.Width;
+                int h_b = mConvertBitmap.Height;
+
+                filterProcessBar.Maximum = w_b*h_b;
+                maxValueProcessBar = w_b*h_b;
+
+                var thread = new Thread(() => _mReCal.StartMedianFilter(value, _mBtImage));
+                thread.Start();
+
+                MedianFilterItem.IsEnabled = false;
+                NegativItem.IsEnabled = false;
+            }
         }
+
     }
 }

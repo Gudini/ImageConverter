@@ -27,12 +27,17 @@ namespace ImageConverter
 
         private void CancelClick(object sender, RoutedEventArgs e)
         {
+            DialogResult = false;
             this.Close();
         }
 
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             pixelTextBox.Text = String.Format("{0:0}", slider.Value);
+            if(okbutton!=null)
+            {
+                okbutton.IsEnabled = true;
+            }
         }
 
         public  String Value
@@ -43,7 +48,24 @@ namespace ImageConverter
         private void OkClick(object sender, RoutedEventArgs e)
         {
             value = String.Format("{0:0}", slider.Value);
+            DialogResult = true;
             this.Close();
+        }
+
+        private void pixelTextChanged(object sender, TextChangedEventArgs e)
+        {
+            if(!pixelTextBox.Text.Equals(""))
+            {
+                slider.Value = Convert.ToInt32(pixelTextBox.Text);
+                if (okbutton != null)
+                {
+                    okbutton.IsEnabled = true;
+                }
+            }
+            else
+            {
+                okbutton.IsEnabled = false;
+            }
         }
     }
 }

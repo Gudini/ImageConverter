@@ -17,7 +17,8 @@
             <Label Grid.Column="0" Content="Радиус:" FontWeight="SemiBold" Foreground="#FF007300" FontSize="12"
                    HorizontalAlignment="Right" VerticalAlignment="Center"/>
             <TextBox x:Name="pixelTextBox" Grid.Column="1" FontWeight="SemiBold" Foreground="#FF007300" FontSize="12"
-                     HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,0"/>
+                     HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,0"
+                     TextChanged="pixelTextChanged"/>
             <Label Grid.Column="2" Content="пикс." FontWeight="SemiBold" Foreground="#FF007300" FontSize="12"
                    HorizontalAlignment="Left" VerticalAlignment="Center"/>
         </Grid>
@@ -28,10 +29,10 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Content="OK" Margin="10,10" HorizontalAlignment="Center" Width="93" 
+            <Button x:Name="okbutton" Grid.Column="0" Content="OK" Margin="10,10" HorizontalAlignment="Center" Width="93" 
                     Click="OkClick"/>
             <Button Grid.Column="1" Content="Отмена" Margin="10,10" HorizontalAlignment="Center" Width="93" 
-                    Click="CancelClick"/>
+                    Click="CancelClick" IsCancel="True" />
         </Grid>
     </Grid>
 </Window>
