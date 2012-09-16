@@ -30,17 +30,19 @@
                     </MenuItem>
                 </MenuItem>
                 <MenuItem Header="_Filter">
-                    <MenuItem x:Name="NegativItem" Header="Negetive" IsEnabled="False">
-                        <MenuItem.Icon>
-                            <Image Height="20" Width="20" Source="icons/negative.png"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
                     <MenuItem x:Name="MedianFilterItem" Header="Median filter" Click="MedianFilterClick" IsEnabled="False">
                         <MenuItem.Icon>
                             <Image Height="20" Width="20" Source="icons/filter.png"/>
                         </MenuItem.Icon>
                     </MenuItem>
                 </MenuItem>
+                <MenuItem Header="_Correction">
+                    <MenuItem x:Name="NegativItem" Header="Negetive" IsEnabled="False" Click="NegetiveClick">
+                        <MenuItem.Icon>
+                            <Image Height="20" Width="20" Source="icons/negative.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem> 
                 <MenuItem Header="_Help">
                     <MenuItem Header="_About">
                         <MenuItem.Icon>

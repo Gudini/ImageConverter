@@ -13,16 +13,19 @@ namespace ImageConverter
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static BitmapImage _mBtImage;
+        private readonly MedianFilterThread _mReCal;
+        private int maxValueProcessBar;
+
+        private readonly NegativeThread _mNegCal;
+
         public MainWindow()
         {
             InitializeComponent();
 
             _mReCal = new MedianFilterThread(delMessage, processBarValue);
+            _mNegCal = new NegativeThread(NegDelMessage, NegProcessBarValue);
         }
-
-        private static BitmapImage _mBtImage;
-        private readonly MedianFilterThread _mReCal;
-        private int maxValueProcessBar;
 
         public void delMessage(BitmapImage image)
         {
@@ -43,6 +46,29 @@ namespace ImageConverter
                                            {
                                                filterProcessBar.Value = value;
                                                LabelValueProcent.Content = procent+" %";
+                                           });
+            filterProcessBar.Dispatcher.Invoke(action, DispatcherPriority.Normal);
+        }
+
+        public void NegDelMessage(BitmapImage image)
+        {
+            Action action = new Action(delegate
+                                           {
+                                               ImageView2.Source = image;
+                                               MedianFilterItem.IsEnabled = true;
+                                               NegativItem.IsEnabled = true;
+                                               filterProcessBar.Value = 0;
+                                               LabelValueProcent.Content = "0 %";
+                                           });
+            ImageView2.Dispatcher.Invoke(action, DispatcherPriority.Normal);
+        }
+
+        public void NegProcessBarValue(int value, int procent)
+        {
+            Action action = new Action(delegate
+                                           {
+                                               filterProcessBar.Value = value;
+                                               LabelValueProcent.Content = procent + " %";
                                            });
             filterProcessBar.Dispatcher.Invoke(action, DispatcherPriority.Normal);
         }
@@ -103,8 +129,32 @@ namespace ImageConverter
 
                 MedianFilterItem.IsEnabled = false;
                 NegativItem.IsEnabled = false;
+                OpenItem.IsEnabled = false;
+                ImageView1.IsReadOnly = true;
+                ImageView2.IsReadOnly = true;
             }
         }
 
+        private void NegetiveClick(object sender, RoutedEventArgs e)
+        {
+            var bitmapConverter = new BitmapImageToBitmapConverter();
+            Bitmap mConvertBitmap = (Bitmap)bitmapConverter.ConvertBack(_mBtImage, null, null, null);
+
+            int w_b = mConvertBitmap.Width;
+            int h_b = mConvertBitmap.Height;
+
+            filterProcessBar.Maximum = w_b * h_b;
+            maxValueProcessBar = w_b * h_b;
+
+            var thread = new Thread(() => _mNegCal.StartNegative(_mBtImage));
+            thread.Start();
+
+            MedianFilterItem.IsEnabled = false;
+            NegativItem.IsEnabled = false;
+
+            OpenItem.IsEnabled = false;
+            ImageView1.IsReadOnly = true;
+            ImageView2.IsReadOnly = true;
+        }
     }
 }
