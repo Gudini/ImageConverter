@@ -32,7 +32,7 @@ namespace ImageConverter
             int w_b = mConvertBitmap.Width;
             int h_b = mConvertBitmap.Height;
 
-            int k = 1, maxValue = w_b * h_b;
+            int k = 1, maxValue = w_b;
             double curValue = 0;
 
             for (int x = 0; x < w_b; x++)
@@ -41,11 +41,10 @@ namespace ImageConverter
                 {
                     Color c = mConvertBitmap.GetPixel(x, y);
                     mConvertBitmap.SetPixel(x, y, Color.FromArgb(255 - c.R, 255 - c.G, 255 - c.B));
-
-                    curValue = k * 100 / maxValue;
-                    _processBarValue(k, (int)curValue);
-                    k++;
                 }
+                //curValue = k / maxValue;
+                //_processBarValue(k, (int)curValue);
+                //k++;
 
             }
 

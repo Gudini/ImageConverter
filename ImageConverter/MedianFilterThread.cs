@@ -31,14 +31,14 @@ namespace ImageConverter
             int k = 1, maxValue = w_b*h_b;
             double curValue=0;
 
-            for (int x = value + 1; x < w_b - value; x++)
+            for (int x = value; x < w_b - value; x++)
             {
-                for (int y = value + 1; y < h_b - value; y++)
+                for (int y = value; y < h_b - value; y++)
                 {
                     MedianFilter(mConvertBitmap, x, y, value);
-                    curValue = k * 100 / maxValue;
-                    _processBarValue(k, (int) curValue);
-                    k++;
+                    //curValue = k * 100 / maxValue;
+                    //_processBarValue(k, (int) curValue);
+                    //k++;
                 }
             }
 
@@ -75,9 +75,6 @@ namespace ImageConverter
                 cB[i] = 0;
             }
 
-            int w_b = (int)myBitmap.Width;
-            int h_b = (int)myBitmap.Height;
-
             for (int i = x - value; i < x + value + 1; i++)
             {
                 for (int j = y - value; j < y + value + 1; j++)
@@ -90,9 +87,9 @@ namespace ImageConverter
                 }
             }
 
-            Quicksort(cR, 0, n - 1);
-            Quicksort(cG, 0, n - 1);
-            Quicksort(cB, 0, n - 1);
+            Array.Sort(cR);
+            Array.Sort(cG);
+            Array.Sort(cB);
 
             int n_ = (int)(n / 2) + 1;
 
@@ -100,41 +97,7 @@ namespace ImageConverter
             cG_ = cG[n_];
             cB_ = cB[n_];
 
-            myBitmap.SetPixel(x, y, System.Drawing.Color.FromArgb(cR_, cG_, cB_));
-
-        }
-
-        public void Quicksort(int[] a, int p, int r)
-        {
-            if (p < r)
-            {
-                int q = Partition(a, p, r);
-                Quicksort(a, p, q - 1);
-                Quicksort(a, q + 1, r);
-            }
-        }
-
-        public int Partition(int[] a, int p, int r)
-        {
-            int x = a[r];
-            int i = p - 1;
-            int tmp;
-            for (int j = p; j < r; j++)
-            {
-
-                if (a[j] <= x)
-                {
-                    i++;
-                    tmp = a[i];
-                    a[i] = a[j];
-                    a[j] = tmp;
-
-                }
-            }
-            tmp = a[r];
-            a[r] = a[i + 1];
-            a[i + 1] = tmp;
-            return (i + 1);
+            myBitmap.SetPixel(x, y, Color.FromArgb(cR_, cG_, cB_));
 
         }
 
