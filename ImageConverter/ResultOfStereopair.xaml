@@ -1,0 +1,11 @@
+﻿<Window x:Class="ImageConverter.ResultOfStereopair"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ResultOfStereopair" Height="532" Width="443">
+    <Grid Background="WhiteSmoke">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Image Grid.Row="0" x:Name="MainImage"/>
+    </Grid>
+</Window>

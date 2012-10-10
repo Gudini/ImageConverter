@@ -42,13 +42,18 @@
                     </MenuItem>
                 </MenuItem>
                 <MenuItem Header="_Image">
-
                     <MenuItem Header="_Adjust">
                         <MenuItem x:Name="EqualizeItem" Header="Equalize" IsEnabled="False" Click="EqualizeClick">
                             <MenuItem.Icon>
                                 <Image Height="20" Width="20" Source="icons/equalize.png"/>
                             </MenuItem.Icon>
                         </MenuItem>
+                    </MenuItem>
+                    <MenuItem x:Name="StereopaitItem" Header="Stereopair">
+                        <MenuItem x:Name="LoadFirstImage" Header="Open first image" Click="LoadFirstItemClick"/>
+                        <MenuItem x:Name="LoadSecondImage" Header="Open second image" Click="LoadSecondItemClick"/>
+                        <Separator/>
+                        <MenuItem x:Name="StartStereopair" Header="Start conversion" IsEnabled="False" Click="StartStereopairItem"/>
                     </MenuItem>
                 </MenuItem>
                 <MenuItem Header="_Help">

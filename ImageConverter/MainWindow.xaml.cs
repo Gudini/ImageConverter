@@ -22,6 +22,11 @@ namespace ImageConverter
 
         private readonly EqualizeThread _mEqCal;
 
+        private readonly StereopairThread _mStCal;
+
+        private BitmapImage mFirstBitmapImage;
+        private BitmapImage mSecondBitmapImage;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -29,6 +34,7 @@ namespace ImageConverter
             _mReCal = new MedianFilterThread(delMessage, processBarValue);
             _mNegCal = new NegativeThread(NegDelMessage, NegProcessBarValue);
             _mEqCal = new EqualizeThread(EqualizeMessage);
+            _mStCal = new StereopairThread(StereoMessage);
         }
 
         public void delMessage(BitmapImage image)
@@ -41,7 +47,6 @@ namespace ImageConverter
                                                EqualizeItem.IsEnabled = true;
                                                filterProcessBar.Value = 0;
                                                LabelValueProcent.Content = "0 %";
-                                               //ImageView2.IsReadOnly = false;
                                                OpenItem.IsEnabled = true;
                                            });
             ImageView2.Dispatcher.Invoke(action, DispatcherPriority.Normal);
@@ -67,7 +72,6 @@ namespace ImageConverter
                                                EqualizeItem.IsEnabled = true;
                                                filterProcessBar.Value = 0;
                                                LabelValueProcent.Content = "0 %";
-                                               //ImageView2.IsReadOnly = false;
                                                OpenItem.IsEnabled = true;
                                            });
             ImageView2.Dispatcher.Invoke(action, DispatcherPriority.Normal);
@@ -96,6 +100,17 @@ namespace ImageConverter
             filterProcessBar.Dispatcher.Invoke(action, DispatcherPriority.Normal);
         }
 
+        public void StereoMessage(BitmapImage image)
+        {
+            Action action = new Action(delegate
+                                           {
+                                               ResultOfStereopair window = new ResultOfStereopair();
+                                               window.SetImage(image);
+                                               window.Show();
+                                           });
+            ImageView1.Dispatcher.Invoke(action, DispatcherPriority.Normal);
+        }
+
         private void OpenFileClick(object sender, RoutedEventArgs e)
         {
             var dlg = new OpenFileDialog
@@ -118,7 +133,6 @@ namespace ImageConverter
                 ImageView1.Source = bitmapImage;
 
                 ImageView2.IsEnabled = true;
-                //ImageView2.Source = bitmapImage;
                 _mBtImage = bitmapImage;
 
             }
@@ -149,9 +163,6 @@ namespace ImageConverter
             NegativItem.IsEnabled = false;
             EqualizeItem.IsEnabled = false;
             OpenItem.IsEnabled = false;
-            //ImageView1.IsReadOnly = true;
-            //ImageView2.IsReadOnly = true;
-
         }
 
         private void NegetiveClick(object sender, RoutedEventArgs e)
@@ -173,8 +184,6 @@ namespace ImageConverter
             EqualizeItem.IsEnabled = false;
 
             OpenItem.IsEnabled = false;
-            //ImageView1.IsReadOnly = true;
-            //ImageView2.IsReadOnly = true;
         }
 
         private void EqualizeClick(object sender, RoutedEventArgs e)
@@ -193,49 +202,53 @@ namespace ImageConverter
             EqualizeItem.IsEnabled = false;
 
             OpenItem.IsEnabled = false;
+        }
 
-            /*
-            int width = mConverterBitmap.Width;
-            int height = mConverterBitmap.Height;
+        private void LoadFirstItemClick(object sender, RoutedEventArgs e)
+        {
+            ImageView2.IsEnabled = true;
+            openDialog(true);
+        }
 
-            Color minColor = mConverterBitmap.GetPixel(0, 0), maxColor = mConverterBitmap.GetPixel(0, 0);
+        private void LoadSecondItemClick(object sender, RoutedEventArgs e)
+        {
+            openDialog(false);
+            StartStereopair.IsEnabled = true;
+        }
 
-            for (int i = 0; i < width; i++)
+        private void openDialog(bool _b)
+        {
+            var dlg = new OpenFileDialog
             {
-                for (int j = 0; j < height; j++)
+                InitialDirectory = "D:\\Images",
+                Filter = "Image files (*.jpg)|*.jpg|PNG (*.png)|*.png|BMP (*.bmp)|*.bmp|All Files(*.*)|*.*",
+                RestoreDirectory = true
+            };
+            if (dlg.ShowDialog() == true)
+            {
+                string selectedFileName = dlg.FileName;
+                var bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.UriSource = new Uri(selectedFileName);
+                bitmapImage.EndInit();
+                if(_b)
                 {
-                    Color curColor = mConverterBitmap.GetPixel(i, j);
-                    if (minColor.GetBrightness() > curColor.GetBrightness())
-                    {
-                        minColor = curColor;
-                    }
-
-                    if (maxColor.GetBrightness() < curColor.GetBrightness())
-                    {
-                        maxColor = curColor;
-                    }
+                    ImageView1.Source = bitmapImage;
+                    mFirstBitmapImage = bitmapImage;
                 }
+                else
+                {
+                    ImageView2.Source = bitmapImage;
+                    mSecondBitmapImage = bitmapImage;
+                }
+
             }
+        }
 
-            float brightness = -0.76F;
-
-            float[][] colorMatrixElements = {
-                                                new float[] {brightness, 0, 0, 0, 0},
-                                                new float[] {0, brightness, 0, 0, 0},
-                                                new float[] {0, 0, brightness, 0, 0},
-                                                new float[] {0, 0, 0, brightness, 0},
-                                                new float[] {brightness, brightness, brightness, 0, 1}
-                                            };
-
-            ColorMatrix colorMatrix = new ColorMatrix(colorMatrixElements);
-
-            ImageAttributes imageAttributes = new ImageAttributes();
-            imageAttributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-            Graphics graphics = Graphics.FromImage(mConverterBitmap);
-            graphics.DrawImage(mConverterBitmap, new Rectangle(0, 0, width, height), 0, 0, width, height, GraphicsUnit.Pixel, imageAttributes);
-
-            ImageView2.Source = (BitmapImage) bitmapConverter.Convert(mConverterBitmap, null, null, null);
-             */
+        private void StartStereopairItem(object sender, RoutedEventArgs e)
+        {
+            var thread = new Thread(() => _mStCal.StartConvertion(mFirstBitmapImage, mSecondBitmapImage));
+            thread.Start();
         }
     }
 }
